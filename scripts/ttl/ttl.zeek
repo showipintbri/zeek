@@ -55,8 +55,6 @@ event connection_state_remove(c: connection)
 		;
 		}
 	if (src_dst_pair !in TTL_COUNT::ttl_tuple) {
-#		print(src_dst_pair);
-#		TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid];
 		if (c$uid in TTL_COUNT::resp_ttl ) {
 			TTL_COUNT::ttl_tuple[src_dst_pair] = (TTL_COUNT::orig_ttl[c$uid] | TTL_COUNT::resp_ttl[c$uid]);
 			}
@@ -64,7 +62,6 @@ event connection_state_remove(c: connection)
 			TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid];
 			}
 		}
-#	print (TTL_COUNT::ttl_tuple);
 	for (i in TTL_COUNT::ttl_tuple) {
 		if (|TTL_COUNT::ttl_tuple[i]| > 3) {
 			#print (i);
@@ -72,4 +69,9 @@ event connection_state_remove(c: connection)
 			}
 		
 		}
+	}
+
+event zeek_done()
+	{
+	print (TTL_COUNT::ttl_tuple);
 	}
