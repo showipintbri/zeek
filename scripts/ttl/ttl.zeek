@@ -3,6 +3,11 @@ module TTL_COUNT;
 export {
     global orig_ttl: table[string] of set[count];
     global resp_ttl: table[string] of set[count];
+    type tuple: record {
+    	orig: addr &log;
+    	resp: addr &log;
+    	};
+    global ttl_tuple: table[tuple] of set[count];
 }
 
 redef record Conn::Info += {
@@ -37,10 +42,27 @@ event connection_state_remove(c: connection)
     {
     if (c$uid in TTL_COUNT::orig_ttl) {
         c$conn$orig_ttl = TTL_COUNT::orig_ttl[c$uid];
-        print (TTL_COUNT::orig_ttl[c$uid]);
+#        print (TTL_COUNT::orig_ttl[c$uid]);
     	}
-    if (c$uid in TTL_COUNT::resp_ttl) {
+    if (c$uid in TTL_COUNT::resp_ttl ) {
         c$conn$resp_ttl = TTL_COUNT::resp_ttl[c$uid];
-        print (TTL_COUNT::resp_ttl[c$uid]);
+#        print (TTL_COUNT::resp_ttl[c$uid]);
     	}
+
+
+    local src_dst_pair: tuple = [$orig=c$id$orig_h, $resp=c$id$resp_h];
+#	print (src_dst_pair);
+#    print (|TTL_COUNT::resp_ttl[c$uid]|);
+	if (src_dst_pair in TTL_COUNT::ttl_tuple) {
+	
+		}
+
+    if (c$uid in TTL_COUNT::resp_ttl && |TTL_COUNT::resp_ttl[c$uid]| > 0) {
+   		TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid] | TTL_COUNT::resp_ttl[c$uid];
+	    }
+    if (c$uid !in TTL_COUNT::resp_ttl) {
+		TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid];
+    	}
+#	print (TTL_COUNT::ttl_tuple[src_dst_pair]);
+	print (TTL_COUNT::ttl_tuple);
     }
