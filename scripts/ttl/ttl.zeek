@@ -6,10 +6,8 @@ export {
 }
 
 redef record Conn::Info += {
-    ## Indicate if the originator of the connection is part of the
-    ## "private" address space defined in RFC1918.
-orig_ttl: set[count] &optional &log;
-resp_ttl: set[count] &optional &log;
+    orig_ttl: set[count] &optional &log;
+    resp_ttl: set[count] &optional &log;
 };
 
 event new_packet(c: connection, p: pkt_hdr) {
