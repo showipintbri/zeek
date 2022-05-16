@@ -51,18 +51,25 @@ event connection_state_remove(c: connection)
 
 
     local src_dst_pair: tuple = [$orig=c$id$orig_h, $resp=c$id$resp_h];
-#	print (src_dst_pair);
-#    print (|TTL_COUNT::resp_ttl[c$uid]|);
 	if (src_dst_pair in TTL_COUNT::ttl_tuple) {
-	
+		;
 		}
-
-    if (c$uid in TTL_COUNT::resp_ttl && |TTL_COUNT::resp_ttl[c$uid]| > 0) {
-   		TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid] | TTL_COUNT::resp_ttl[c$uid];
-	    }
-    if (c$uid !in TTL_COUNT::resp_ttl) {
-		TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid];
-    	}
-#	print (TTL_COUNT::ttl_tuple[src_dst_pair]);
-	print (TTL_COUNT::ttl_tuple);
-    }
+	if (src_dst_pair !in TTL_COUNT::ttl_tuple) {
+#		print(src_dst_pair);
+#		TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid];
+		if (c$uid in TTL_COUNT::resp_ttl ) {
+			TTL_COUNT::ttl_tuple[src_dst_pair] = (TTL_COUNT::orig_ttl[c$uid] | TTL_COUNT::resp_ttl[c$uid]);
+			}
+		if (c$uid !in TTL_COUNT::resp_ttl ) {
+			TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid];
+			}
+		}
+#	print (TTL_COUNT::ttl_tuple);
+	for (i in TTL_COUNT::ttl_tuple) {
+		if (|TTL_COUNT::ttl_tuple[i]| > 2) {
+			print (i);
+			print ("Greater than 2 TTL values");
+			}
+		
+		}
+	}
