@@ -68,7 +68,7 @@ event connection_state_remove(c: connection)
 	for (i in TTL_COUNT::ttl_tuple) {
 		if (|TTL_COUNT::ttl_tuple[i]| > 3) {
 			#print (i);
-			print ("%s has Greater than 3 TTL values: %s", i, |TTL_COUNT::ttl_tuple[i]|);
+			print fmt("%s has Greater than 3 TTL values: %s", i, |TTL_COUNT::ttl_tuple[i]|);
 			}
 		
 		}
