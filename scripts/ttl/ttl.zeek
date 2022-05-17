@@ -52,26 +52,34 @@ event connection_state_remove(c: connection)
 
     local src_dst_pair: tuple = [$orig=c$id$orig_h, $resp=c$id$resp_h];
 	if (src_dst_pair in TTL_COUNT::ttl_tuple) {
-		;
+		if (c$uid in TTL_COUNT::resp_ttl && c$uid in TTL_COUNT::orig_ttl) {
+			for (i in (TTL_COUNT::orig_ttl[c$uid] | TTL_COUNT::resp_ttl[c$uid])) {
+				add TTL_COUNT::ttl_tuple[src_dst_pair][i];
+				}
+			}
+		if (c$uid !in TTL_COUNT::resp_ttl && c$uid in TTL_COUNT::orig_ttl ) {
+			for (i in TTL_COUNT::orig_ttl[c$uid]) {
+				add TTL_COUNT::ttl_tuple[src_dst_pair][i];
+				}
+			}
 		}
 	if (src_dst_pair !in TTL_COUNT::ttl_tuple) {
-		if (c$uid in TTL_COUNT::resp_ttl ) {
+		if (c$uid in TTL_COUNT::resp_ttl && c$uid in TTL_COUNT::orig_ttl) {
 			TTL_COUNT::ttl_tuple[src_dst_pair] = (TTL_COUNT::orig_ttl[c$uid] | TTL_COUNT::resp_ttl[c$uid]);
 			}
-		if (c$uid !in TTL_COUNT::resp_ttl ) {
+		if (c$uid !in TTL_COUNT::resp_ttl && c$uid in TTL_COUNT::orig_ttl) {
 			TTL_COUNT::ttl_tuple[src_dst_pair] = TTL_COUNT::orig_ttl[c$uid];
 			}
-		}
-	for (i in TTL_COUNT::ttl_tuple) {
-		if (|TTL_COUNT::ttl_tuple[i]| > 3) {
-			#print (i);
-			print fmt("%s has Greater than 3 TTL values: %s", i, |TTL_COUNT::ttl_tuple[i]|);
-			}
-		
 		}
 	}
 
 event zeek_done()
 	{
-	print (TTL_COUNT::ttl_tuple);
+	for (i in TTL_COUNT::ttl_tuple) {
+		if (|TTL_COUNT::ttl_tuple[i]| > 2) {
+			#print (i);
+			print fmt("%s has Greater than 2 TTL values: %s", i, |TTL_COUNT::ttl_tuple[i]|);
+			}
+		
+		}
 	}
