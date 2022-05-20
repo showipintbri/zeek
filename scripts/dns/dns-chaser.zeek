@@ -2,7 +2,6 @@ module DNS;
 
 export {
 	global resolved_names: table[string] of set[addr];
-	global temp_table: table[string] of set[string];
 	global types: set[string];
 
 	}
@@ -10,7 +9,6 @@ export {
 event zeek_init()
 	{
 	types = set("A","AAAA");
-	#print (types);
 	}
 
 event log_dns(rec: DNS::Info)
@@ -19,18 +17,21 @@ event log_dns(rec: DNS::Info)
 		if (rec$qtype_name in types) {
 			local qry: string = rec$query;
 			local ans: vector of string = rec$answers;
-			local ans_set: set[string];
+			local address_set: set[addr];
 			#print (qry);
 			#print (ans);
 			for (i in ans) {
-				add ans_set[ans[i]];
+				if (is_valid_ip(ans[i]) == T) {
+					local str_to_addr: addr = to_addr(ans[i]);
+					add address_set[str_to_addr];
+					}
 				}
-			temp_table[qry] = ans_set;
+			resolved_names[qry] = address_set;
 			}
 		}
 	}
 
 event zeek_done()
 	{
-	print (temp_table);
+	print (resolved_names);
 	}
