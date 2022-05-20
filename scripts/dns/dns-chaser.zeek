@@ -29,6 +29,9 @@ event log_dns(rec: DNS::Info)
 					add address_set[str_to_addr];
 					}
 				}
+			# The below is not appending to the already existing set
+			# instead is it over writting the existing set
+			# this causes an issue
 			resolved_names[qry] = address_set;
 			}
 		}
