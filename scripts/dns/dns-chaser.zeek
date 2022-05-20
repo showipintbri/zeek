@@ -3,8 +3,11 @@ module DNS;
 export {
 	global resolved_names: table[string] of set[addr];
 	global types: set[string];
-
 	}
+	
+redef record Conn::Info += {
+    dns_seen: bool &optional &log;
+};
 
 event zeek_init()
 	{
@@ -27,6 +30,17 @@ event log_dns(rec: DNS::Info)
 					}
 				}
 			resolved_names[qry] = address_set;
+			}
+		}
+	}
+	
+event connection_state_remove(c: connection)
+	{
+	for (i in resolved_names) {
+		for (x in resolved_names[i]) {
+			if (c$id$resp_h == x) {
+				c$conn$dns_seen = T;
+				}
 			}
 		}
 	}
